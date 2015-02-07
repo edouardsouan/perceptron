@@ -13,11 +13,11 @@
         var mousePressed = false;
         var mousePixelIndex = -1;
 
-        var TX_APPRENTISSAGE = 1;
+        var TX_APPRENTISSAGE = 3;
 
-        var ACTIVATION = 3;
+        var ACTIVATION = 1;
 
-        var CHARGE = 0.5;
+        var CHARGE = 0.1;
 
         function init() {
 
@@ -29,10 +29,10 @@
 
             initInputsTab();
 
-
-            canvas.addEventListener("mousedown", function(e) {
+            canvas.addEventListener("click", function(e) {
                 var mousePoint = mouseCanvasPosition(e);
                 togglePixelAtPoint(mousePoint);
+                mousePressed = true;
                 drawPixels();
             });
 
@@ -84,31 +84,17 @@
         /* ------  */
 
         function learn(expectedNumber) {
-
-            //tableauDesInputs[number] = pixels;
             var tableauDeSorties = [];
             tableauDeSorties = process();
 
             for (var number = 0; number < OUTPUT_COUNT; number++) {
-                var obtenu = 0;
-                var attentu = 0;
-                var entre = 0;
-
-                if (tableauDeSorties[number]) {
-                    obtenu = 1;
-                }
-
-                if (number == expectedNumber) {
-                    attentu = 1;
-                }
+                var obtenu = tableauDeSorties[number] ? 1: 0;
+                var attendu = isExpectedNumber(number, expectedNumber);
 
                 for(var x=0; x <GRID_WIDTH; x++){
                     for(var y=0; y<GRID_HEIGHT; y++){
                         var active = pixels[x][y] ? 1 :0;
-                        if (active) {
-                            entre = 1;
-                            tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attentu - obtenu) * entre * CHARGE);
-                        }
+                        tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
                     }
                 }
             }
@@ -148,6 +134,14 @@
                     }
                 }
             }
+        }
+
+        function isExpectedNumber(number,expectedNumber){
+            var result = 0;
+            if (number == expectedNumber) {
+                result = 1;
+            }
+            return result;
         }
 
 
