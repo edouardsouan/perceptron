@@ -1,216 +1,254 @@
-  var PIXEL_SIZE = 50; //pixels
+var PIXEL_SIZE = 50; //pixels
 
-        var GRID_WIDTH = 0;
-        var GRID_HEIGHT = 0;
+var GRID_WIDTH = 0;
+var GRID_HEIGHT = 0;
 
-        var OUTPUT_COUNT = 6;
+var OUTPUT_COUNT = 6;
 
-        var pixels = [];
+var pixels = [];
 
-        var tableauDePoids = [];
-        var tableauDesInputs = [];
+var tableauDePoids = [];
+var tableauDesInputs = [];
 
-        var mousePressed = false;
-        var mousePixelIndex = -1;
+var mousePressed = false;
+var mousePixelIndex = -1;
 
-        var TX_APPRENTISSAGE = 3;
+var TX_APPRENTISSAGE = 1;
 
-        var ACTIVATION = 1;
+var ACTIVATION = 3;
 
-        var CHARGE = 0.1;
+var CHARGE = 0.5;
 
-        function init() {
+function init() {
 
-            var canvas = document.getElementById("canvas");
-            GRID_WIDTH = Math.floor(canvas.width/PIXEL_SIZE);
-            GRID_HEIGHT = Math.floor(canvas.height/PIXEL_SIZE);
+    var canvas = document.getElementById("canvas");
+    GRID_WIDTH = Math.floor(canvas.width/PIXEL_SIZE);
+    GRID_HEIGHT = Math.floor(canvas.height/PIXEL_SIZE);
 
-            resetCanvas();
+    resetCanvas();
 
-            initInputsTab();
+    initInputsTab();
 
-            canvas.addEventListener("click", function(e) {
-                var mousePoint = mouseCanvasPosition(e);
-                togglePixelAtPoint(mousePoint);
-                mousePressed = true;
+    canvas.addEventListener("click", function(e) {
+        var mousePoint = mouseCanvasPosition(e);
+        togglePixelAtPoint(mousePoint);
+        mousePressed = true;
+        drawPixels();
+    });
+
+    canvas.addEventListener("mousedown", function(e) {
+        mousePressed = true;
+    }, false);
+    canvas.addEventListener("mouseup", function(e) {
+        mousePressed = false;
+    }, false);
+
+    canvas.addEventListener("mousemove", function(e) {
+        if(mousePressed) {
+            var mousePoint = mouseCanvasPosition(e);
+            var pixelIndex = pixelIndexAtPoint(e);
+            if(pixelIndex != mousePixelIndex) {
+                setPixelValueAtPoint(mousePoint, true);
                 drawPixels();
-            });
-
-            canvas.addEventListener("mousedown", function(e) {
-                mousePressed = true;
-            }, false);
-            canvas.addEventListener("mouseup", function(e) {
-                mousePressed = false;
-            }, false);
-
-            canvas.addEventListener("mousemove", function(e) {
-                if(mousePressed) {
-                    var mousePoint = mouseCanvasPosition(e);
-                    var pixelIndex = pixelIndexAtPoint(e);
-                    if(pixelIndex != mousePixelIndex) {
-                        setPixelValueAtPoint(mousePoint, true);
-                        drawPixels();
-                        mousePixelIndex = pixelIndex;
-                    }
-                }
-            })
-        }
-
-        function learnClicked() {
-            var learnedNumber = parseInt($("#inputNumber").val());
-            learn(learnedNumber);
-            processClicked();
-        }
-
-        function processClicked() {
-            processedNumbers = [];
-            processedNumbers = process();
-            showProcessedNumbers(processedNumbers);
-        }
-
-        function showProcessedNumbers(processedNumbers) {
-
-            var result = "";
-            for (var number = 0; number < OUTPUT_COUNT; number++) {
-                if (processedNumbers[number] == true) {
-                    result += number + ", ";
-                }
-            }
-
-            if(result.length > 0) result = result.substring(0, result.length-1);
-            $("#outputNumber").val(result);
-        }
-
-        /* ------  */
-
-        function learn(expectedNumber) {
-            var tableauDeSorties = [];
-            tableauDeSorties = process();
-
-            for (var number = 0; number < OUTPUT_COUNT; number++) {
-                var obtenu = tableauDeSorties[number] ? 1: 0;
-                var attendu = isExpectedNumber(number, expectedNumber);
-
-                for(var x=0; x <GRID_WIDTH; x++){
-                    for(var y=0; y<GRID_HEIGHT; y++){
-                        var active = pixels[x][y] ? 1 :0;
-                        tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
-                    }
-                }
+                mousePixelIndex = pixelIndex;
             }
         }
+    })
+}
 
+function learnClicked() {
+    initChart();
+    var learnedNumber = parseInt($("#inputNumber").val());
+    learn(learnedNumber);
+    processClicked();
+}
 
-        function process() {
-            var sorties = [];
-            for(var i=0; i<OUTPUT_COUNT; i++){
-                sorties[i] = 0;
-            }
-            for(var number = 0; number < OUTPUT_COUNT; number++){
-                var estActive = 0;
-                for(var x=0; x <GRID_WIDTH; x++){
-                    for(var y=0; y<GRID_HEIGHT; y++){
-                        if (pixels[x][y] == true) {
-                            estActive = tableauDesInputs[number][x][y]
-                        }
-                    }
-                }
-                if (estActive >= ACTIVATION) {
-                    sorties[number] = true;
-                }
-            }
-            return sorties;
+function processClicked() {
+    processedNumbers = [];
+    processedNumbers = process();
+    showProcessedNumbers(processedNumbers);
+}
 
+function showProcessedNumbers(processedNumbers) {
+
+    var result = "";
+    for (var number = 0; number < OUTPUT_COUNT; number++) {
+        if (processedNumbers[number] == true) {
+            result += number + ", ";
         }
+    }
 
-        function initInputsTab(){
-            for(var number=0; number <OUTPUT_COUNT; number++){
-                tableauDesInputs[number] = [];
+    if(result.length > 0) result = result.substring(0, result.length-1);
+    $("#outputNumber").val(result);
+}
 
-                for(var x =0; x < GRID_WIDTH; x++){
-                    tableauDesInputs[number][x] = [];
-                    for(var y=0; y <GRID_HEIGHT; y++){
-                        tableauDesInputs[number][x][y] = 0;
-                    }
+/* ------  */
+
+function learn(expectedNumber) {
+    var tableauDeSorties = [];
+    tableauDeSorties = process();
+
+    for (var number = 0; number < OUTPUT_COUNT; number++) {
+        var obtenu = tableauDeSorties[number] ? 1: 0;
+        var attendu = isExpectedNumber(number, expectedNumber);
+
+        for(var x=0; x <GRID_WIDTH; x++){
+            for(var y=0; y<GRID_HEIGHT; y++){
+                var active = pixels[x][y] ? 1 :0;
+                tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
+            }
+        }
+    }
+}
+
+
+function process() {
+    var sorties = [];
+    var estActive = 0;
+    sorties = initOutputsTab(sorties);
+
+    for(var number = 0; number < OUTPUT_COUNT; number++){
+
+        for(var x=0; x <GRID_WIDTH; x++){
+            for(var y=0; y<GRID_HEIGHT; y++){
+                if (pixels[x][y] == true) {
+                    estActive += tableauDesInputs[number][x][y]
                 }
             }
         }
+        console.log('est active: '+estActive+' activation: '+ACTIVATION+' number: '+number);
 
-        function isExpectedNumber(number,expectedNumber){
-            var result = 0;
-            if (number == expectedNumber) {
-                result = 1;
-            }
-            return result;
+        if (estActive >= ACTIVATION) {
+            sorties[number] = true;
         }
+    }
+    return sorties;
+}
 
+function initInputsTab(){
+    for(var number=0; number <OUTPUT_COUNT; number++){
+        tableauDesInputs[number] = [];
 
-        /* ------  */
-
-
-        function mouseCanvasPosition(e) {
-            var rect = canvas.getBoundingClientRect();
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
-        }
-
-        function pixelIndexAtPoint(point) {
-            var pixelIndex = -1;
-            var x = Math.floor(point.x/PIXEL_SIZE);
-            var y = Math.floor(point.y/PIXEL_SIZE);
-            if(x < GRID_WIDTH && y < GRID_HEIGHT) {
-                pixelIndex = y * GRID_WIDTH + x;
-            }
-            return pixelIndex;
-        }
-
-        function togglePixelAtPoint(point) {
-            var x = Math.floor(point.x/PIXEL_SIZE);
-            var y = Math.floor(point.y/PIXEL_SIZE);
-            if(x < GRID_WIDTH && y < GRID_HEIGHT) {
-                pixels[x][y] = !pixels[x][y];
+        for(var x =0; x < GRID_WIDTH; x++){
+            tableauDesInputs[number][x] = [];
+            for(var y=0; y <GRID_HEIGHT; y++){
+                tableauDesInputs[number][x][y] = 0;
             }
         }
+    }
+}
 
-        function setPixelValueAtPoint(point, value) {
-            var x = Math.floor(point.x/PIXEL_SIZE);
-            var y = Math.floor(point.y/PIXEL_SIZE);
-            if(x < GRID_WIDTH && y < GRID_HEIGHT) {
-                pixels[x][y] = value;
+function initOutputsTab(sorties){
+    for(var i=0; i<OUTPUT_COUNT; i++){
+        sorties[i] = 0;
+    }
+    return sorties;
+}
+
+function isExpectedNumber(number,expectedNumber){
+    var result = 0;
+    if (number == expectedNumber) {
+        result = 1;
+    }
+    return result;
+}
+
+function initChart(){
+    var ctx = document.getElementById("chart").getContext("2d");
+    var data = {
+        labels: ["Eating", "Drinking", "Sleeping", "Designing", "Coding", "Cycling", "Running"],
+        datasets: [
+            {
+                label: "My First dataset",
+                fillColor: "rgba(220,220,220,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: [65, 59, 90, 81, 56, 55, 40]
+            },
+            {
+                label: "My Second dataset",
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: [28, 48, 40, 19, 96, 27, 100]
             }
-        }
+        ]
+    };
+    var chart = new Chart(ctx).Radar(data);
+}
 
-        function resetCanvas() {
-            $('#inputNumber').val('');
-            $('#outputNumber').val('');
-            resetPixels();
-            drawPixels();
-        }
+/* ------  */
 
-        function resetPixels() {
-            for(var x = 0; x < GRID_WIDTH; x++) {
-                pixels[x] = [];
-                for(var y = 0; y < GRID_HEIGHT; y++) {
-                    pixels[x][y] = false;
-                }
-            }
-        }
 
-        function drawPixels() {
-            var canvas = document.getElementById("canvas");
-            var context = canvas.getContext("2d");
+function mouseCanvasPosition(e) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    };
+}
 
-            for(var y = 0; y < GRID_HEIGHT; y++) {
-                for(var x = 0; x < GRID_WIDTH; x++) {
-                    context.beginPath();
-                    context.rect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
-                    context.fillStyle = pixels[x][y] ? '#2D2' : '#555';
-                    context.fill();
-                    context.lineWidth = 1;
-                    context.strokeStyle = '#000';
-                    context.stroke();
-                }
-            }
+function pixelIndexAtPoint(point) {
+    var pixelIndex = -1;
+    var x = Math.floor(point.x/PIXEL_SIZE);
+    var y = Math.floor(point.y/PIXEL_SIZE);
+    if(x < GRID_WIDTH && y < GRID_HEIGHT) {
+        pixelIndex = y * GRID_WIDTH + x;
+    }
+    return pixelIndex;
+}
+
+function togglePixelAtPoint(point) {
+    var x = Math.floor(point.x/PIXEL_SIZE);
+    var y = Math.floor(point.y/PIXEL_SIZE);
+    if(x < GRID_WIDTH && y < GRID_HEIGHT) {
+        pixels[x][y] = !pixels[x][y];
+    }
+}
+
+function setPixelValueAtPoint(point, value) {
+    var x = Math.floor(point.x/PIXEL_SIZE);
+    var y = Math.floor(point.y/PIXEL_SIZE);
+    if(x < GRID_WIDTH && y < GRID_HEIGHT) {
+        pixels[x][y] = value;
+    }
+}
+
+function resetCanvas() {
+    $('#inputNumber').val('');
+    $('#outputNumber').val('');
+    resetPixels();
+    drawPixels();
+}
+
+function resetPixels() {
+    for(var x = 0; x < GRID_WIDTH; x++) {
+        pixels[x] = [];
+        for(var y = 0; y < GRID_HEIGHT; y++) {
+            pixels[x][y] = false;
         }
+    }
+}
+
+function drawPixels() {
+    var canvas = document.getElementById("canvas");
+    var context = canvas.getContext("2d");
+
+    for(var y = 0; y < GRID_HEIGHT; y++) {
+        for(var x = 0; x < GRID_WIDTH; x++) {
+            context.beginPath();
+            context.rect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+            context.fillStyle = pixels[x][y] ? '#2D2' : '#555';
+            context.fill();
+            context.lineWidth = 1;
+            context.strokeStyle = '#000';
+            context.stroke();
+        }
+    }
+}
