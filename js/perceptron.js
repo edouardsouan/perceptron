@@ -170,7 +170,11 @@ function initChart(){
             }
         ]
     };
-    var chart = new Chart(ctx).Radar(data);
+
+    var options = {
+        scaleShowLabels: false
+    };
+    var chart = new Chart(ctx).Radar(data,options);
 }
 
 function fillWeightArray(number, weight) {
