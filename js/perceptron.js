@@ -97,8 +97,7 @@ function learn(expectedNumber) {
             for(var y=0; y<GRID_HEIGHT; y++){
                 var active = pixels[x][y] ? 1 :0;
                 tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
-                tableauDePoids[parseInt(expectedNumber)-1] = tableauDePoids[parseInt(expectedNumber)-1] !== undefined ? tableauDePoids[parseInt(expectedNumber)-1] : 0;
-                tableauDePoids[parseInt(expectedNumber)-1] = Math.abs(tableauDePoids[parseInt(expectedNumber)-1] + tableauDesInputs[number][x][y]);
+                fillWeightArray(expectedNumber, tableauDesInputs[number][x][y]);
             }
         }
     }
@@ -167,11 +166,17 @@ function initChart(){
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(220,220,220,1)",
-                data: tableauDePoids//[tableauDePoids[1],0,0,0,0,0]
+                data: tableauDePoids
             }
         ]
     };
     var chart = new Chart(ctx).Radar(data);
+}
+
+function fillWeightArray(number, weight) {
+    number = parseInt(number) - 1;
+    weight = Math.abs(parseFloat(weight));
+    tableauDePoids[number] = tableauDePoids[number] === undefined ? 0 : tableauDePoids[number] + weight;
 }
 
 /* ------  */
