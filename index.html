@@ -5,7 +5,7 @@
     <script src="js/perceptron.js"></script>
     <link href="css/bootstrap.css" rel="stylesheet"/>
 </head>
-<body onLoad="init();">
+<body onLoad="init(); initChart();">
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -15,20 +15,20 @@
     </div>
 </nav>
 
+<div class="container" style="margin-top : 60px;">
 
-<div class="container" style="margin-top : 50px;">
-
-    <div class="starter-template">
+    <div>
         <h1>Improved perceptron</h1>
         <p class="lead">Developped by Edouard Souan, Nicolas Machut and Johan Henin. Have fun !</p>
     </div>
+
+    <br/>
 
     <div class="row">
         <div class="col-lg-4">
             <canvas id="canvas" width="300" height="400" style="float:left">
                 alternate content
             </canvas>
-            <input type="button" class="btn btn-primary" onclick="resetCanvas()" value="Reset canvas"></button>
         </div>
         <div class="col-lg-4">
             <form class="form-inline">
@@ -43,6 +43,7 @@
                 </div>
                 <input type="button" class="btn btn-primary" value="Process" onclick="processClicked()"/>
             </form>
+            <input type="button" style="margin-top : 30px;" class="btn btn-primary" onclick="resetCanvas()" value="Reset canvas"></button>
         </div>
         <div class="col-lg-4">
             <canvas id="chart" width="400" height="400"></canvas>
