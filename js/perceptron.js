@@ -8,6 +8,7 @@ var OUTPUT_COUNT = 6;
 var pixels = [];
 
 var tableauDePoids = [];
+
 var tableauDesInputs = [];
 
 var mousePressed = false;
@@ -57,10 +58,10 @@ function init() {
 }
 
 function learnClicked() {
-    initChart();
     var learnedNumber = parseInt($("#inputNumber").val());
     learn(learnedNumber);
     processClicked();
+    initChart();
 }
 
 function processClicked() {
@@ -96,11 +97,12 @@ function learn(expectedNumber) {
             for(var y=0; y<GRID_HEIGHT; y++){
                 var active = pixels[x][y] ? 1 :0;
                 tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
+                tableauDePoids[parseInt(expectedNumber)] = tableauDePoids[parseInt(expectedNumber)] !== undefined ? tableauDePoids[parseInt(expectedNumber)] : 0;
+                tableauDePoids[parseInt(expectedNumber)] = tableauDePoids[parseInt(expectedNumber)] + tableauDesInputs[number][x][y];
             }
         }
     }
 }
-
 
 function process() {
     var sorties = [];
@@ -116,8 +118,6 @@ function process() {
                 }
             }
         }
-        console.log('est active: '+estActive+' activation: '+ACTIVATION+' number: '+number);
-
         if (estActive >= ACTIVATION) {
             sorties[number] = true;
         }
@@ -154,19 +154,20 @@ function isExpectedNumber(number,expectedNumber){
 }
 
 function initChart(){
+    console.log(tableauDePoids[1]);
     var ctx = document.getElementById("chart").getContext("2d");
     var data = {
         labels: ["1", "2", "3", "4", "5", "6"],
         datasets: [
             {
-                label: "My First dataset",
+                label: "Weight of connections",
                 fillColor: "rgba(255,192,203,0.2)",
                 strokeColor: "rgba(220,220,220,1)",
                 pointColor: "rgba(220,220,220,1)",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(220,220,220,1)",
-                data: [65, 59, 90, 81, 56, 55]
+                data: [tableauDePoids[1],0,0,0,0,0]
             }
         ]
     };
