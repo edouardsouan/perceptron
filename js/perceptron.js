@@ -234,10 +234,10 @@ function drawPixels() {
         for(var x = 0; x < GRID_WIDTH; x++) {
             context.beginPath();
             context.rect(x*PIXEL_SIZE, y*PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
-            context.fillStyle = pixels[x][y] ? '#2D2' : '#555';
+            context.fillStyle = pixels[x][y] ? '#E74944' : '#DCDCDC';
             context.fill();
             context.lineWidth = 1;
-            context.strokeStyle = '#000';
+            context.strokeStyle = '#777';
             context.stroke();
         }
     }
