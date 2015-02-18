@@ -14,7 +14,7 @@ var tableauDesInputs = [];
 var mousePressed = false;
 var mousePixelIndex = -1;
 
-var TX_APPRENTISSAGE = 1;
+var TX_APPRENTISSAGE = 1.5;
 
 var ACTIVATION = 3;
 
@@ -29,6 +29,7 @@ function init() {
     resetCanvas();
 
     initInputsTab();
+    initWeightArray();
 
     canvas.addEventListener("click", function(e) {
         var mousePoint = mouseCanvasPosition(e);
@@ -95,14 +96,14 @@ function learn(expectedNumber) {
     tableauDeSorties = process();
 
     for (var number = 0; number < OUTPUT_COUNT; number++) {
-        var obtenu = tableauDeSorties[number] ? 1: 0;
+        var obtenu = tableauDeSorties[number] ? 1 : 0;
         var attendu = isExpectedNumber(number, expectedNumber);
 
-        for(var x=0; x <GRID_WIDTH; x++){
-            for(var y=0; y<GRID_HEIGHT; y++){
-                var active = pixels[x][y] ? 1 :0;
-                tableauDesInputs[number][x][y] =  tableauDesInputs[number][x][y] + ((attendu - obtenu) * active * CHARGE);
-                fillWeightArray(expectedNumber, tableauDesInputs[number][x][y]);
+        for (var x = 0; x < GRID_WIDTH; x++) {
+            for (var y = 0; y < GRID_HEIGHT; y++) {
+                var active = pixels[x][y] ? 1 : 0;
+                tableauDesInputs[number][x][y] = tableauDesInputs[number][x][y] + TX_APPRENTISSAGE * ((attendu - obtenu) * active * CHARGE);
+                fillWeightArray(number, tableauDesInputs[number][x][y]);
             }
         }
     }
@@ -110,18 +111,18 @@ function learn(expectedNumber) {
 
 function process() {
     var sorties = [];
-    var estActive = 0;
     sorties = initOutputsTab(sorties);
 
     for(var number = 0; number < OUTPUT_COUNT; number++){
-
+        var estActive = 0;
         for(var x=0; x <GRID_WIDTH; x++){
             for(var y=0; y<GRID_HEIGHT; y++){
                 if (pixels[x][y] == true) {
-                    estActive += tableauDesInputs[number][x][y]
+                    estActive += tableauDesInputs[number][x][y];
                 }
             }
         }
+        console.log(estActive + " - " + tableauDePoids[number]+" "+number);
         if (estActive >= ACTIVATION) {
             sorties[number] = true;
         }
@@ -158,10 +159,9 @@ function isExpectedNumber(number,expectedNumber){
 }
 
 function initChart(){
-    console.log(tableauDePoids);
     var ctx = document.getElementById("chart").getContext("2d");
     var data = {
-        labels: ["1", "2", "3", "4", "5", "6"],
+        labels: ["0","1", "2", "3", "4", "5", "6"],
         datasets: [
             {
                 label: "Weight of connections",
@@ -182,10 +182,15 @@ function initChart(){
     var chart = new Chart(ctx).Radar(data,options);
 }
 
+function initWeightArray() {
+    for(var number=0; number<=OUTPUT_COUNT; number++) {
+        tableauDePoids[number] = 0;
+    }
+}
+
 function fillWeightArray(number, weight) {
-    number = parseInt(number) - 1;
-    weight = Math.abs(parseFloat(weight));
-    tableauDePoids[number] = tableauDePoids[number] === undefined ? 0 : tableauDePoids[number] + weight;
+    weight = parseFloat(weight);
+    tableauDePoids[number] = tableauDePoids[number] + weight;
 }
 
 /* ------  */
