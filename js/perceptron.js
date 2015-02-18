@@ -29,6 +29,7 @@ function init() {
     resetCanvas();
 
     initInputsTab();
+    initWeightArray();
 
     canvas.addEventListener("click", function(e) {
         var mousePoint = mouseCanvasPosition(e);
@@ -182,10 +183,16 @@ function initChart(){
     var chart = new Chart(ctx).Radar(data,options);
 }
 
+function initWeightArray() {
+    for(var number=0; number<OUTPUT_COUNT; number++) {
+        tableauDePoids[number] = 0;
+    }
+}
+
 function fillWeightArray(number, weight) {
     number = parseInt(number) - 1;
     weight = Math.abs(parseFloat(weight));
-    tableauDePoids[number] = tableauDePoids[number] === undefined ? 0 : tableauDePoids[number] + weight;
+    tableauDePoids[number] = tableauDePoids[number] + weight;
 }
 
 /* ------  */
