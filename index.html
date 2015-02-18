@@ -31,19 +31,25 @@
             </canvas>
         </div>
         <div class="col-lg-4">
-            <form class="form-inline">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="inputNumber">
+            <center>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="inputNumber">
+                    </div>
+                    <input type="button" class="btn btn-primary" value="Learn" onclick="learnClicked()"/>
+                </form>
+                <table>
+                    <tr>
+                        <td><input type="button" class="btn btn-primary" value="Process" onclick="processClicked()"/></td>
+                        <td><input style="margin-left : 20px;"type="button" class="btn btn-primary" onclick="resetCanvas()" value="Reset canvas"></button></td>
+                    </tr>
+                </table>
+                <br/><br/>
+                <div id="resultDiv" style="display:none">
+                    <h1>Result</h1>
+                    <h2 id="result"></h2>
                 </div>
-                <input type="button" class="btn btn-primary" value="Learn" onclick="learnClicked()"/>
-            </form>
-            <form class="form-inline">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="outputNumber">
-                </div>
-                <input type="button" class="btn btn-primary" value="Process" onclick="processClicked()"/>
-            </form>
-            <input type="button" style="margin-top : 30px;" class="btn btn-primary" onclick="resetCanvas()" value="Reset canvas"></button>
+            </center>
         </div>
         <div class="col-lg-4">
             <h4>Graphe des poids de chaque nombre</h4>

@@ -58,6 +58,7 @@ function init() {
 }
 
 function learnClicked() {
+    initChart();
     var learnedNumber = parseInt($("#inputNumber").val());
     learn(learnedNumber);
     processClicked();
@@ -79,8 +80,12 @@ function showProcessedNumbers(processedNumbers) {
         }
     }
 
-    if(result.length > 0) result = result.substring(0, result.length-1);
-    $("#outputNumber").val(result);
+    if(result.length > 0) {
+        result = result.substring(0, result.length-1);
+        $("#outputNumber").val(result);
+        $("#result").text(result);
+        $("#resultDiv").show();
+    }
 }
 
 /* ------  */
@@ -223,6 +228,7 @@ function setPixelValueAtPoint(point, value) {
 function resetCanvas() {
     $('#inputNumber').val('');
     $('#outputNumber').val('');
+    $("#resultDiv").hide();
     resetPixels();
     drawPixels();
 }
