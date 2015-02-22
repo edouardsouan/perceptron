@@ -14,11 +14,11 @@ var tableauDesInputs = [];
 var mousePressed = false;
 var mousePixelIndex = -1;
 
-var TX_APPRENTISSAGE = 1.5;
+var TX_APPRENTISSAGE = 0.2;
+var CHARGE = 1;
 
-var ACTIVATION = 3;
-
-var CHARGE = 0.5;
+var ACTIVATION = 1;
+var chart;
 
 function init() {
 
@@ -34,7 +34,6 @@ function init() {
     canvas.addEventListener("click", function(e) {
         var mousePoint = mouseCanvasPosition(e);
         togglePixelAtPoint(mousePoint);
-        mousePressed = true;
         drawPixels();
     });
 
@@ -43,17 +42,21 @@ function init() {
     }, false);
     canvas.addEventListener("mouseup", function(e) {
         mousePressed = false;
+        console.log(mousePressed);
     }, false);
 
     canvas.addEventListener("mousemove", function(e) {
+        console.log(mousePressed);
         if(mousePressed) {
             var mousePoint = mouseCanvasPosition(e);
-            var pixelIndex = pixelIndexAtPoint(e);
+            var pixelIndex = pixelIndexAtPoint(mousePoint);
             if(pixelIndex != mousePixelIndex) {
                 setPixelValueAtPoint(mousePoint, true);
                 drawPixels();
+                togglePixelAtPoint(mousePoint);
                 mousePixelIndex = pixelIndex;
             }
+            togglePixelAtPoint(mousePoint);
         }
     })
 }
@@ -63,7 +66,7 @@ function learnClicked() {
     var learnedNumber = parseInt($("#inputNumber").val());
     learn(learnedNumber);
     processClicked();
-    initChart();
+    chart.update();
 }
 
 function processClicked() {
@@ -94,15 +97,13 @@ function showProcessedNumbers(processedNumbers) {
 function learn(expectedNumber) {
     var tableauDeSorties = [];
     tableauDeSorties = process();
-
     for (var number = 0; number < OUTPUT_COUNT; number++) {
         var obtenu = tableauDeSorties[number] ? 1 : 0;
         var attendu = isExpectedNumber(number, expectedNumber);
-
         for (var x = 0; x < GRID_WIDTH; x++) {
             for (var y = 0; y < GRID_HEIGHT; y++) {
                 var active = pixels[x][y] ? 1 : 0;
-                tableauDesInputs[number][x][y] = tableauDesInputs[number][x][y] + TX_APPRENTISSAGE * ((attendu - obtenu) * active * CHARGE);
+                tableauDesInputs[number][x][y] = tableauDesInputs[number][x][y] + TX_APPRENTISSAGE * (attendu - obtenu) * active ;//* CHARGE;
                 fillWeightArray(number, tableauDesInputs[number][x][y]);
             }
         }
@@ -122,7 +123,6 @@ function process() {
                 }
             }
         }
-        console.log(estActive + " - " + tableauDePoids[number]+" "+number);
         if (estActive >= ACTIVATION) {
             sorties[number] = true;
         }
@@ -179,7 +179,7 @@ function initChart(){
     var options = {
         scaleShowLabels: false
     };
-    var chart = new Chart(ctx).Radar(data,options);
+    chart = new Chart(ctx).Radar(data,options);
 }
 
 function initWeightArray() {
@@ -191,6 +191,7 @@ function initWeightArray() {
 function fillWeightArray(number, weight) {
     weight = parseFloat(weight);
     tableauDePoids[number] = tableauDePoids[number] + weight;
+    chart.datasets[0].points[number].value = tableauDePoids[number] > 0 ? tableauDePoids[number] : 0;
 }
 
 /* ------  */
@@ -234,6 +235,7 @@ function resetCanvas() {
     $('#inputNumber').val('');
     $('#outputNumber').val('');
     $("#resultDiv").hide();
+    $('result').val('');
     resetPixels();
     drawPixels();
 }
