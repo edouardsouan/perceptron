@@ -1,4 +1,4 @@
-var PIXEL_SIZE = 50; //pixels
+var PIXEL_SIZE = 30; //pixels
 
 var GRID_WIDTH = 0;
 var GRID_HEIGHT = 0;
@@ -42,21 +42,18 @@ function init() {
     }, false);
     canvas.addEventListener("mouseup", function(e) {
         mousePressed = false;
-        console.log(mousePressed);
     }, false);
 
     canvas.addEventListener("mousemove", function(e) {
-        console.log(mousePressed);
         if(mousePressed) {
             var mousePoint = mouseCanvasPosition(e);
+            togglePixelAtPoint(mousePoint);
             var pixelIndex = pixelIndexAtPoint(mousePoint);
             if(pixelIndex != mousePixelIndex) {
                 setPixelValueAtPoint(mousePoint, true);
                 drawPixels();
-                togglePixelAtPoint(mousePoint);
                 mousePixelIndex = pixelIndex;
             }
-            togglePixelAtPoint(mousePoint);
         }
     })
 }
