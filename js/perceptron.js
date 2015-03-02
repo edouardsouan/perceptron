@@ -47,9 +47,9 @@ function init() {
     canvas.addEventListener("mousemove", function(e) {
         if(mousePressed) {
             var mousePoint = mouseCanvasPosition(e);
-            togglePixelAtPoint(mousePoint);
             var pixelIndex = pixelIndexAtPoint(mousePoint);
             if(pixelIndex != mousePixelIndex) {
+                togglePixelAtPoint(mousePoint);
                 setPixelValueAtPoint(mousePoint, true);
                 drawPixels();
                 mousePixelIndex = pixelIndex;
@@ -100,7 +100,7 @@ function learn(expectedNumber) {
         for (var x = 0; x < GRID_WIDTH; x++) {
             for (var y = 0; y < GRID_HEIGHT; y++) {
                 var active = pixels[x][y] ? 1 : 0;
-                tableauDesInputs[number][x][y] = tableauDesInputs[number][x][y] + TX_APPRENTISSAGE * (attendu - obtenu) * active ;//* CHARGE;
+                tableauDesInputs[number][x][y] = tableauDesInputs[number][x][y] + TX_APPRENTISSAGE * (attendu - obtenu) * active * CHARGE;
                 fillWeightArray(number, tableauDesInputs[number][x][y]);
             }
         }
